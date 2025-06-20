@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <button id="logoutButton" onclick="logout()">Cerrar sesión</button>
+
+
+    <h1>Agregar nuevo disco</h1>
+    <form id="formAdd" onsubmit="agregarDisco(event)">
+        <label for="nombre"> Nombre:</label>
+        <input type="text" id="nombre" required> <br> <br>
+
+        <label for="artista">Artista:</label>
+        <input type="text" id="artista"> <br> <br>
+
+        <label for="fecha_pub">Fecha de Publicación:</label>
+        <input type="number" id="fecha_pub"> <br> <br>
+
+        <label for="discografica">Discográfica:</label>
+        <input type="text" id="discografica"> <br> <br>
+
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio"> <br> <br>
+
+
+        <button type="submit"> Enviar</button>
+    </form>
+
+
+    <h1>Actualizar disco completo</h1>
+    <form id="formUpdate" onsubmit="actualizarDisco(event)">
+        <label for="idActualizar">ID:</label>
+        <input type="number" id="idActualizar" required> <br> <br>
+
+        <label for="nombreActualizar">Nombre</label>
+        <input type="text" id="nombreActualizar" required> <br><br>
+
+        <label for="artista">Artista:</label>
+        <input type="text" id="artistaActualizar"> <br> <br>
+
+        <label for="fecha_pub">Fecha de Publicación:</label>
+        <input type="number" id="fecha_pubActualizar"> <br> <br>
+
+        <label for="discografica">Discográfica:</label>
+        <input type="text" id="discograficaActualizar"> <br> <br>
+
+        <label for="precio">Precio:</label>
+        <input type="number" id="precioActualizar"> <br> <br>
+
+        <button type="submit"> ACTUALIZAR DISCO</button>
+
+    </form>
+
+    <h1>Actualizar disco parcialmente</h1>
+    <form id="formParcialUpdate" onsubmit="actualizarParcial(event)">
+        <label for="idParcial">Id de Disco:</label>
+        <input type="number" id="idParcial" required> <br><br>
+
+        <label for="campo"> Campo para actualizar</label>
+        <select id="campo">
+            <option value="nombre">Nombre</option>
+            <option value="artista">Artista</option>
+            <option value="fecha_pub">Fecha de Publicación</option>
+            <option value="discografica">Discogáfica</option>
+            <option value="precio">Precio</option>
+        </select> <br><br>
+
+        <label for="valor">Valor</label>
+        <input type="text" id="valor" required> <br><br>
+
+        <button type="submit">Actualizar Parcialmente</button>
+
+    </form>
+
+    <h1>Borrar disco</h1>
+
+    <form id="borrarDisco" onsubmit="borrarDisco(event)">
+        <label for="idBorrar">Id del disco a eliminar</label>
+        <input id="idBorrar" type="number" required>
+
+        <button type="submit"> Borrar disco</button>
+    </form>
+
+
+
+
+    <script>
+        async function agregarDisco(event) {
+            event.preventDefault();
+
+            const disco = {
+                nombre: document.getElementById("nombre").value,
+                Artista: document.getElementById("artista").value,
+                fecha_pub: document.getElementById("fecha_pub").value,
+                Discografica: document.getElementById("discografica").value,
+                Precio: document.getElementById("precio").value,
+            }
+
+            const response = await fetch("http://localhost:3000/discos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(disco)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert("Disco creado " + data.id)
+            } else {
+                alert("Sucedio un error")
+            }
+
+
+        }
+
+
+        async function actualizarDisco(event) {
+            event.preventDefault();
+
+            const id = document.getElementById("idActualizar").value;
+
+            console.log(id)
+
+            const disco = {
+                nombre: document.getElementById("nombreActualizar").value,
+                Artista: document.getElementById("artistaActualizar").value,
+                fecha_pub: document.getElementById("fecha_pubActualizar").value,
+                Discografica: document.getElementById("discograficaActualizar").value,
+                Precio: document.getElementById("precioActualizar").value,
+            }
+
+            const response = await fetch(`http://localhost:3000/discos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(disco),
+            });
+
+            if (response.ok) {
+                alert("Disco actualizado")
+            } else {
+                alert("Error al actualizar disco")
+            }
+        }
+
+
+        async function actualizarParcial(event) {
+            event.preventDefault();
+
+            const id = document.getElementById("idParcial").value;
+            const campo = document.getElementById("campo").value;
+            const valor = document.getElementById("valor").value;
+
+            const cambios = {};
+
+            cambios[campo] = valor;
+
+            const response = await fetch(`http://localhost:3000/discos/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cambios)
+            })
+
+            if (response.ok) {
+                alert("Disco actualizado parcialmente" + id)
+            } else {
+                alert("Error al actualizar parcialmente")
+            }
+
+        }
+
+        async function borrarDisco(event) {
+            event.preventDefault();
+
+            const id = document.getElementById("idBorrar").value;
+
+            const response = await fetch(`http://localhost:3000/discos/${id}`, {
+                method: "DELETE",
+            })
+
+            if (response.ok) {
+                alert("Disco elmininado")
+            } else {
+                alert("Error al eliminar el disco")
+            }
+
+        }
+
+        async function logout() {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                // Redirigir al login o a una página pública
+                window.location.href = '/login';
+            } else {
+                alert("Error al cerrar sesión");
+            }
+        }
+
+
+    </script>
+
+</body>
+
+</html>
