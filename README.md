@@ -1,4 +1,4 @@
-nstala los paquetes -> npm install
+Instala los paquetes -> npm install
 Agragar archivo con tus credenciales .env
 - DB_HOST=
 - DB_USER=
